@@ -4,16 +4,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.plaf.synth.SynthSeparatorUI;
-
-import org.apache.pdfbox.exceptions.COSVisitorException;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.util.PDFTextStripper;
+import org.apache.pdfbox.text.PDFTextStripper;
 
 
 
@@ -31,7 +27,7 @@ public class LeitorPrevia {
 	// JFrame frame;
 	PDDocument previa;
 
-	public void run(String arqEnt, String saida) throws IOException, COSVisitorException {
+	public void run(String arqEnt, String saida) throws IOException {
 
 		System.out.println("arqEnt :" + arqEnt + " saida: "+saida);
 		
@@ -47,7 +43,7 @@ public class LeitorPrevia {
 		// Pattern.MULTILINE);
 
 		previa = PDDocument.load(arquivoEntrada);
-		List pagList = previa.getDocumentCatalog().getAllPages();
+		List pagList = previa.getDocumentCatalog().getOutputIntents();
 		PDFTextStripper ts = new PDFTextStripper();
 		String regional = "";
 		int pgInicial = 0;
@@ -87,15 +83,15 @@ public class LeitorPrevia {
 	}
 
 	private void geraArquivo(List doc, String regional, int pgInicial, int pgFinal)
-			throws IOException, COSVisitorException {
+			throws IOException {
 		regional = regional.replaceAll("[\\s\\/\\,\\-]", "_");
 		PDDocument newDoc = new PDDocument();
 		for (int i = pgInicial; i <= pgFinal; i++) {
 			PDPage pgOld = (PDPage) doc.get(i - 1);
 			PDPage pg = newDoc.importPage(pgOld);
-			pg.setCropBox(pgOld.findCropBox());
-			pg.setMediaBox(pgOld.findMediaBox());
-			pg.setRotation(pgOld.findRotation());
+			pg.setCropBox(pgOld.getCropBox());
+			pg.setMediaBox(pgOld.getMediaBox());
+			pg.setRotation(pgOld.getRotation());
 			// pg.setMediaBox(PDPage.PAGE_SIZE_A4);
 
 		}

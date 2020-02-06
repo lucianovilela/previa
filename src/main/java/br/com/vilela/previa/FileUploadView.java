@@ -11,7 +11,6 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.RequestScoped;
 import javax.faces.context.FacesContext;
 
-import org.apache.pdfbox.exceptions.COSVisitorException;
 import org.primefaces.model.UploadedFile;
 
 @ManagedBean
@@ -35,7 +34,7 @@ public class FileUploadView {
  
 
  
-    public void upload() throws COSVisitorException, IOException {
+    public void upload() throws  IOException {
     	
     	
         if (file != null) {
