@@ -4,8 +4,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.swing.plaf.synth.SynthSeparatorUI;
 
 import org.apache.pdfbox.exceptions.COSVisitorException;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -18,7 +21,7 @@ public class LeitorPrevia {
 
 
 	private File arquivoEntrada;
-	private File dirSaida = new File("/home/luciano/temp/previa");
+	private File dirSaida;
 	private final int INICIAL = 1;
 	private final int FINAL = 2;
 	private int status = INICIAL;
@@ -28,14 +31,17 @@ public class LeitorPrevia {
 	// JFrame frame;
 	PDDocument previa;
 
-	public void run(String arqEnt) throws IOException, COSVisitorException {
+	public void run(String arqEnt, String saida) throws IOException, COSVisitorException {
 
+		System.out.println("arqEnt :" + arqEnt + " saida: "+saida);
+		
 		arquivoEntrada = new File(arqEnt);
+		this.dirSaida = new File(saida);
 		// ptRegional = Pattern.compile(
 		// "^LOTACAO:\\s+\\d+\\s+\\-\\s+([\\w\\s\\/\\,\\.\\-]+)\\sMUNICIPIO.*$",
 		// Pattern.MULTILINE);
 
-		ptRegional = Pattern.compile(".*LOTAC\\s-\\s\\d+\\s+([\\w\\s\\/\\,\\.\\-]+)$", Pattern.MULTILINE);
+		ptRegional = Pattern.compile(".*LOTACAO SECUNDARIA:\\s\\d+\\s+-\\s([\\w\\s\\/\\,\\.]+)\\s+MUNICIPIO\\s+-$", Pattern.MULTILINE);
 		ptFinaliza = Pattern.compile("^.*INATIVOS.*CEDIDOS.*REQUISITADOS.*$", Pattern.MULTILINE);
 		// ptFinaliza = Pattern.compile("^.*TOTAL DA SOLICITACAO POR LOTACAO.*$",
 		// Pattern.MULTILINE);

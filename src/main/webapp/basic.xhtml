@@ -6,23 +6,22 @@
 	xmlns:p="http://primefaces.org/ui">
 <h:head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<title>Hello World</title>
+	<title>Processa Previa 2020</title>
 </h:head>
 <h:body>
 
 	<p:growl id="messages" showDetail="true" />
- 
-Single file<br />
-	<h:form enctype="multipart/form-data">
-		<p:fileUpload value="#{fileUploadView.file}" mode="simple" multiple="false"
-		    label="Seleciona arquivo de previa"
-			skinSimple="true" />
-		<br />
-		<p:commandButton value="Processa" ajax="false"
-			action="#{fileUploadView.upload}" disabled="false" />
-	</h:form>
 
-	<br />
+	<p:panel header="Infoma aquivo da Previa">
+		<h:form enctype="multipart/form-data">
+			<p:fileUpload value="#{fileUploadView.file}" mode="simple"
+				multiple="false" label="Seleciona arquivo de previa"
+				skinSimple="true" />
+			<br />
+			<p:commandButton value="Processa" ajax="false"
+				action="#{fileUploadView.upload}" disabled="false" />
+		</h:form>
+	</p:panel>
 
 
 </h:body>
