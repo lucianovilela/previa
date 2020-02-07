@@ -1,0 +1,1 @@
+web: java -jar target/previa-0.0.1-SNAPSHOT.war -httpPort $PORT

@@ -9,17 +9,20 @@ import java.util.UUID;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.RequestScoped;
+import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 import org.primefaces.model.UploadedFile;
 
 @ManagedBean
-@RequestScoped
+@SessionScoped
 public class FileUploadView {
      
 	private LeitorPrevia leitor;
 	
-	private String arquivoEntrada;
+
 	
     private UploadedFile file;
 
@@ -40,10 +43,22 @@ public class FileUploadView {
         if (file != null) {
         	
         	File arquivo = saveUpload();
-        	
+        	File saida = createTempDir();
+        	File saidaFile = new File(createTempDir(), "previa.zip");
         	leitor = new LeitorPrevia();
-            leitor.run(arquivo.getAbsolutePath(), createTempDir().getAbsolutePath());
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Arquivo processado")	);
+            leitor.run(arquivo.getAbsolutePath(), saida.getAbsolutePath());
+            
+            ZipUtils appZip = new ZipUtils(saida.getAbsolutePath());
+            appZip.generateFileList(saida);
+            appZip.zipIt(saidaFile.getAbsolutePath());
+
+            DefaultStreamedContent fileOutput = new DefaultStreamedContent();
+            fileOutput.setName("previa.zip");
+            fileOutput.setContentType("application/zip");
+            fileOutput.setStream( FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream( saidaFile.getAbsolutePath()));
+                  
+            
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Arquivo processado "+ fileOutput.getContentLength() )	);
 
         }
     }
@@ -63,6 +78,15 @@ public class FileUploadView {
     	}
     	return result;
     }
+    
+    private StreamedContent fileOutput;
+    
+        
+ 
+    public StreamedContent getFileOutput() {
+        return fileOutput;
+    }    
+    
     
     private  File createTempDir() throws IOException
     {

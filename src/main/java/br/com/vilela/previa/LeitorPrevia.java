@@ -7,9 +7,10 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.pdfbox.exceptions.COSVisitorException;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.text.PDFTextStripper;
+import org.apache.pdfbox.util.PDFTextStripper;
 
 
 
@@ -43,7 +44,7 @@ public class LeitorPrevia {
 		// Pattern.MULTILINE);
 
 		previa = PDDocument.load(arquivoEntrada);
-		List pagList = previa.getDocumentCatalog().getOutputIntents();
+		List pagList = previa.getDocumentCatalog().getAllPages();
 		PDFTextStripper ts = new PDFTextStripper();
 		String regional = "";
 		int pgInicial = 0;
@@ -91,7 +92,7 @@ public class LeitorPrevia {
 			PDPage pg = newDoc.importPage(pgOld);
 			pg.setCropBox(pgOld.getCropBox());
 			pg.setMediaBox(pgOld.getMediaBox());
-			pg.setRotation(pgOld.getRotation());
+			pg.setRotation(pgOld.findRotation());
 			// pg.setMediaBox(PDPage.PAGE_SIZE_A4);
 
 		}
@@ -105,7 +106,12 @@ public class LeitorPrevia {
 		// entPrevia.setPaginaFinal(pgFinal);
 		//
 		// ByteArrayOutputStream s = new ByteArrayOutputStream();
-		newDoc.save(s);
+		try {
+			newDoc.save(s);
+		} catch (COSVisitorException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		// entPrevia.setArquivoBin(s.toByteArray());
 
