@@ -20,11 +20,32 @@ import org.primefaces.model.UploadedFile;
 public class FileUploadView {
 
 	private LeitorPrevia leitor;
-	
+
 	private UploadedFile file;
+	
+	private String fileNameOutput;
+	private DefaultStreamedContent fileOutput;
+	
+	public DefaultStreamedContent getFileOutput() {
+		return fileOutput;
+	}
+
+	public String getFileNameOutput() {
+		return fileNameOutput;
+	}
+
+	public void setFileNameOutput(String fileNameOutput) {
+		this.fileNameOutput = fileNameOutput;
+	}
 
 	private File saidaFile;
-	private DefaultStreamedContent fileOutput;
+	public File getSaidaFile() {
+		return saidaFile;
+	}
+
+
+
+
 
 	public UploadedFile getFile() {
 		return file;
@@ -35,14 +56,20 @@ public class FileUploadView {
 	}
 
 	public void download() {
-		
+		System.out.println("download: "+fileNameOutput);
+		fileOutput = new DefaultStreamedContent(
+				FacesContext.getCurrentInstance()
+				.getExternalContext()
+				.getResourceAsStream(fileNameOutput),
+				"application/zip", "previa.zip");
+
 	}
 
 	public String getFileOutputName() {
-		return saidaFile==null?"sem arquivo de saida":saidaFile.getAbsolutePath();
-		
+		return saidaFile == null ? "sem arquivo de saida" : saidaFile.getAbsolutePath();
+
 	}
-	
+
 	public void processa() throws IOException {
 
 		if (file != null) {
@@ -56,14 +83,8 @@ public class FileUploadView {
 			ZipUtils appZip = new ZipUtils(saida.getAbsolutePath());
 			appZip.generateFileList(saida);
 			appZip.zipIt(saidaFile.getAbsolutePath());
-			fileOutput = new DefaultStreamedContent();
-			fileOutput.setName("previa.zip");
-			fileOutput.setContentType("application/zip");
-			fileOutput.setStream(FacesContext.getCurrentInstance().getExternalContext()
-					.getResourceAsStream(saidaFile.getAbsolutePath()));
-			
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage("Arquivo processado "));
+			fileNameOutput= saidaFile.getAbsolutePath();
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Arquivo processado "));
 
 		}
 	}
@@ -85,10 +106,6 @@ public class FileUploadView {
 	}
 
 
-	public StreamedContent getFileOutput() {
-		System.out.println(fileOutput != null);
-		return fileOutput;
-	}
 
 	private File createTempDir() throws IOException {
 		final File sysTempDir = new File(System.getProperty("java.io.tmpdir"));
