@@ -46,8 +46,8 @@
 			<h:form>
 				<h:inputHidden  value="#{fileUploadView.fileNameOutput}" />
 				<p:commandLink value="Download" 
-					onclick="PrimeFaces.monitorDownload(start, stop);" 
-					action="#{fileUploadView.download()}" icon="pi pi-arrow-down" >
+					onclick="PrimeFaces.monitorDownload(start, stop);"  ajax="false"
+				    icon="pi pi-arrow-down" update="@all">
 					<p:fileDownload value="#{fileUploadView.fileOutput}" />
 				</p:commandLink>
 			</h:form>

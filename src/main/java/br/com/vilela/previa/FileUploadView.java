@@ -1,6 +1,8 @@
 package br.com.vilela.previa;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,11 +24,27 @@ public class FileUploadView {
 	private LeitorPrevia leitor;
 
 	private UploadedFile file;
-	
+
 	private String fileNameOutput;
 	private StreamedContent fileOutput;
-	
+
 	public StreamedContent getFileOutput() {
+		if (fileNameOutput != null) {
+			System.out.println("download: " + fileNameOutput);
+//			InputStream stream = ((ServletContext)FacesContext.getCurrentInstance().getExternalContext().getContext()).getResourceAsStream(fileNameOutput);
+			InputStream stream=null;
+			try {
+				stream = new FileInputStream(fileNameOutput);
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			fileOutput = new DefaultStreamedContent(
+					stream,
+					"application/zip", "previa.zip");
+			System.out.println(fileOutput);
+		}
 		return fileOutput;
 	}
 
@@ -39,13 +57,10 @@ public class FileUploadView {
 	}
 
 	private File saidaFile;
+
 	public File getSaidaFile() {
 		return saidaFile;
 	}
-
-
-
-
 
 	public UploadedFile getFile() {
 		return file;
@@ -56,13 +71,11 @@ public class FileUploadView {
 	}
 
 	public void download() {
-		System.out.println("download: "+fileNameOutput);
+		System.out.println("download: " + fileNameOutput);
 		fileOutput = new DefaultStreamedContent(
-				FacesContext.getCurrentInstance()
-				.getExternalContext()
-				.getResourceAsStream(fileNameOutput),
+				FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream(fileNameOutput),
 				"application/zip", "previa.zip");
-		
+
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Download "));
 
 	}
@@ -85,7 +98,7 @@ public class FileUploadView {
 			ZipUtils appZip = new ZipUtils(saida.getAbsolutePath());
 			appZip.generateFileList(saida);
 			appZip.zipIt(saidaFile.getAbsolutePath());
-			fileNameOutput= saidaFile.getAbsolutePath();
+			fileNameOutput = saidaFile.getAbsolutePath();
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Arquivo processado "));
 
 		}
@@ -106,8 +119,6 @@ public class FileUploadView {
 		}
 		return result;
 	}
-
-
 
 	private File createTempDir() throws IOException {
 		final File sysTempDir = new File(System.getProperty("java.io.tmpdir"));
