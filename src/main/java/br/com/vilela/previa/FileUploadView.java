@@ -24,9 +24,9 @@ public class FileUploadView {
 	private UploadedFile file;
 	
 	private String fileNameOutput;
-	private DefaultStreamedContent fileOutput;
+	private StreamedContent fileOutput;
 	
-	public DefaultStreamedContent getFileOutput() {
+	public StreamedContent getFileOutput() {
 		return fileOutput;
 	}
 
@@ -62,6 +62,8 @@ public class FileUploadView {
 				.getExternalContext()
 				.getResourceAsStream(fileNameOutput),
 				"application/zip", "previa.zip");
+		
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Download "));
 
 	}
 

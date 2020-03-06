@@ -37,7 +37,7 @@
 	</script>
 
 
-		<p:panel header="Download">
+		<p:panel header="Download" visible="#{fileUploadView.fileNameOutput!=null}">
 
 			<p:dialog modal="true" widgetVar="statusDialog" header="Status"
 				draggable="false" closable="false" resizable="false">
@@ -45,11 +45,11 @@
 			</p:dialog>
 			<h:form>
 				<h:inputHidden  value="#{fileUploadView.fileNameOutput}" />
-				<p:commandButton value="Download" ajax="false"
-					onclick="PrimeFaces.monitorDownload(start, stop);"
-					action="#{fileUploadView.download()}" icon="pi pi-arrow-down">
+				<p:commandLink value="Download" 
+					onclick="PrimeFaces.monitorDownload(start, stop);" 
+					action="#{fileUploadView.download()}" icon="pi pi-arrow-down" >
 					<p:fileDownload value="#{fileUploadView.fileOutput}" />
-				</p:commandButton>
+				</p:commandLink>
 			</h:form>
 		</p:panel>
 	</ui:define>
