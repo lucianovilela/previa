@@ -34,14 +34,14 @@ public class LeitorPrevia {
 		
 		arquivoEntrada = new File(arqEnt);
 		this.dirSaida = new File(saida);
-		// ptRegional = Pattern.compile(
-		// "^LOTACAO:\\s+\\d+\\s+\\-\\s+([\\w\\s\\/\\,\\.\\-]+)\\sMUNICIPIO.*$",
-		// Pattern.MULTILINE);
+		ptRegional = Pattern.compile(
+		 "^LOTACAO:\\s+\\d+\\s+\\-\\s+([\\w\\s\\/\\,\\.\\-]+)\\sMUNICIPIO.*$",
+		Pattern.MULTILINE);
 
-		ptRegional = Pattern.compile(".*LOTACAO SECUNDARIA:\\s\\d+\\s+-\\s([\\w\\s\\/\\,\\.]+)\\s+MUNICIPIO\\s+-$", Pattern.MULTILINE);
-		ptFinaliza = Pattern.compile("^.*INATIVOS.*CEDIDOS.*REQUISITADOS.*$", Pattern.MULTILINE);
-		// ptFinaliza = Pattern.compile("^.*TOTAL DA SOLICITACAO POR LOTACAO.*$",
-		// Pattern.MULTILINE);
+		//ptRegional = Pattern.compile(".*LOTACAO SECUNDARIA:\\s\\d+\\s+-\\s([\\w\\s\\/\\,\\.]+)\\s+MUNICIPIO\\s+-$", Pattern.MULTILINE);
+		//ptFinaliza = Pattern.compile("^.*INATIVOS.*CEDIDOS.*REQUISITADOS.*$", Pattern.MULTILINE);
+		ptFinaliza = Pattern.compile("^.*TOTAL DA SOLICITACAO POR LOTACAO.*$",
+		 Pattern.MULTILINE);
 
 		previa = PDDocument.load(arquivoEntrada);
 		List pagList = previa.getDocumentCatalog().getAllPages();
