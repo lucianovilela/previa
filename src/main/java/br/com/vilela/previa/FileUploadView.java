@@ -155,7 +155,7 @@ public class FileUploadView {
 		}
 	}
 
-	public boolean isEmProcessamento() {
+	public boolean getEmProcessamento() {
 		return emProcessamento;
 	}
 
