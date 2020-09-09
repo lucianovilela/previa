@@ -18,10 +18,14 @@
 			<p:growl></p:growl>
 				<p:fileUpload value="#{fileUploadView.file}" mode="simple"
 					multiple="false" label="Seleciona arquivo de previa"
-					skinSimple="true" />
+					skinSimple="true" auto="true" />
 				<br />
-				<p:commandButton value="Processa" ajax="false" 
-					action="#{fileUploadView.processa}" disabled="false" />
+				<p:commandButton value="Upload" ajax="false" 
+					action="#{fileUploadView.upload}" disabled="false" update="@all"/>
+					
+				<p:commandButton value="Processa" ajax="true" 
+					action="#{fileUploadView.processa}" disabled="false" update="@all"/>
+
 			</h:form>
 		</p:panel>
 		<script type="text/javascript">

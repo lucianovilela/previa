@@ -10,15 +10,15 @@ import java.util.UUID;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
-import javax.faces.view.ViewScoped;
 
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.UploadedFile;
 
 @ManagedBean
-@ViewScoped
+@SessionScoped
 public class FileUploadView {
 
 	private LeitorPrevia leitor;
@@ -27,7 +27,11 @@ public class FileUploadView {
 
 	private String fileNameOutput;
 	private StreamedContent fileOutput;
+	
+	private File fileInput;
 
+	private boolean emProcessamento=false;
+	
 	public StreamedContent getFileOutput() {
 		if (fileNameOutput != null) {
 			System.out.println("download: " + fileNameOutput);
@@ -84,24 +88,33 @@ public class FileUploadView {
 		return saidaFile == null ? "sem arquivo de saida" : saidaFile.getAbsolutePath();
 
 	}
+	
+	public void upload() throws IOException {
+		fileInput  = saveUpload();
+	}
 
 	public void processa() throws IOException {
-
-		if (file != null) {
-
-			File arquivo = saveUpload();
-			File saida = createTempDir();
-			saidaFile = new File(createTempDir(), "previa.zip");
-			leitor = new LeitorPrevia();
-			leitor.run(arquivo.getAbsolutePath(), saida.getAbsolutePath());
-
-			ZipUtils appZip = new ZipUtils(saida.getAbsolutePath());
-			appZip.generateFileList(saida);
-			appZip.zipIt(saidaFile.getAbsolutePath());
-			fileNameOutput = saidaFile.getAbsolutePath();
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Arquivo processado "));
-
+		emProcessamento=true;
+		try {
+			if (file != null) {
+	
+				
+				File saida = createTempDir();
+				saidaFile = new File(createTempDir(), "previa.zip");
+				leitor = new LeitorPrevia();
+				leitor.run(fileInput.getAbsolutePath(), saida.getAbsolutePath());
+	
+				ZipUtils appZip = new ZipUtils(saida.getAbsolutePath());
+				appZip.generateFileList(saida);
+				appZip.zipIt(saidaFile.getAbsolutePath());
+				fileNameOutput = saidaFile.getAbsolutePath();
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Arquivo processado "));
+	
+			}
+		}finally {
+			emProcessamento=false;
 		}
+		
 	}
 
 	private File saveUpload() throws IOException {
@@ -140,6 +153,14 @@ public class FileUploadView {
 		} else {
 			throw new IOException("Failed to create temp dir named " + newTempDir.getAbsolutePath());
 		}
+	}
+
+	public boolean isEmProcessamento() {
+		return emProcessamento;
+	}
+
+	public void setEmProcessamento(boolean emProcessamento) {
+		this.emProcessamento = emProcessamento;
 	}
 
 }
