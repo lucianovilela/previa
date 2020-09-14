@@ -10,15 +10,15 @@ import java.util.UUID;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
-import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
+import javax.faces.view.ViewScoped;
 
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.UploadedFile;
 
 @ManagedBean
-@SessionScoped
+@ViewScoped
 public class FileUploadView {
 
 	private LeitorPrevia leitor;

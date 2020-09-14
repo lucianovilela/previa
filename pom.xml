@@ -89,6 +89,7 @@
 						</goals>
 						<phase>package</phase>
 						<configuration>
+						
 							<path>/</path>
 						</configuration>
 					</execution>
