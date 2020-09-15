@@ -10,15 +10,16 @@ import java.util.UUID;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
-import javax.faces.view.ViewScoped;
 
+import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
-import org.primefaces.model.UploadedFile;
+import org.primefaces.model.file.UploadedFile;
 
 @ManagedBean
-@ViewScoped
+@SessionScoped
 public class FileUploadView {
 
 	private LeitorPrevia leitor;
@@ -26,11 +27,24 @@ public class FileUploadView {
 	private UploadedFile file;
 
 	private String fileNameOutput;
+
 	private StreamedContent fileOutput;
 	
 	private File fileInput;
 
 	private boolean emProcessamento=false;
+	
+    public void handleFileUpload(FileUploadEvent event) {
+        FacesMessage msg = new FacesMessage("Successful", event.getFile().getFileName() + " is uploaded.");
+        try {
+        	file = event.getFile();
+			upload();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+    }	
 	
 	public StreamedContent getFileOutput() {
 		if (fileNameOutput != null) {
@@ -52,13 +66,6 @@ public class FileUploadView {
 		return fileOutput;
 	}
 
-	public String getFileNameOutput() {
-		return fileNameOutput;
-	}
-
-	public void setFileNameOutput(String fileNameOutput) {
-		this.fileNameOutput = fileNameOutput;
-	}
 
 	private File saidaFile;
 
@@ -84,19 +91,20 @@ public class FileUploadView {
 
 	}
 
-	public String getFileOutputName() {
-		return saidaFile == null ? "sem arquivo de saida" : saidaFile.getAbsolutePath();
-
-	}
 	
-	public void upload() throws IOException {
+	public String upload() throws IOException {
 		fileInput  = saveUpload();
+		return null;
+	}
+
+	public void setEmProcessamento(boolean emProcessamento) {
+		this.emProcessamento = emProcessamento;
 	}
 
 	public void processa() throws IOException {
 		emProcessamento=true;
 		try {
-			if (file != null) {
+			if (fileInput != null) {
 	
 				
 				File saida = createTempDir();
@@ -120,7 +128,7 @@ public class FileUploadView {
 	private File saveUpload() throws IOException {
 		File result = null;
 		if (file != null) {
-			InputStream in = file.getInputstream();
+			InputStream in = file.getInputStream();
 			result = new File(createTempDir(), file.getFileName());
 			FileOutputStream out = new FileOutputStream(result);
 			byte buffer[] = new byte[2048];
@@ -159,8 +167,15 @@ public class FileUploadView {
 		return emProcessamento;
 	}
 
-	public void setEmProcessamento(boolean emProcessamento) {
-		this.emProcessamento = emProcessamento;
+	public File getFileInput() {
+		return fileInput;
+	}
+	public String getFileNameOutput() {
+		return fileNameOutput;
+	}
+
+	public void setFileNameOutput(String fileNameOutput) {
+		this.fileNameOutput = fileNameOutput;
 	}
 
 }

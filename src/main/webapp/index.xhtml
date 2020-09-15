@@ -8,51 +8,57 @@
 	xmlns:pm="http://primefaces.org/mobile" template="/template.xhtml">
 
 	<ui:define name="body">
-		<div>
-			<h:outputText value="#{fileUploadView.fileNameOutput}" />
 
-		</div>
 
-		<h:form enctype="multipart/form-data">
 
-			<p:panel header="Infoma aquivo da Previa">
+		<p:panel header="Infoma aquivo da Previa">
+			<h:form enctype="multipart/form-data">
 				<p:growl></p:growl>
-				<p:fileUpload value="#{fileUploadView.file}" mode="simple"
-					multiple="false" label="Seleciona arquivo de previa"
-					skinSimple="true" auto="false" />
-				<br />
-				<p:commandButton value="Upload" ajax="false"
-					action="#{fileUploadView.upload}" disabled="false" update="@all" />
+				<p:fileUpload value="#{fileUploadView.file}" mode="advanced"
+					auto="true" multiple="false" label="Seleciona arquivo de previa"
+					listener="#{fileUploadView.handleFileUpload}" skinSimple="true"
+					update="proc" />
+			</h:form>
 
-			</p:panel>
-			<p:panel>
-				<p:commandButton value="Processa" ajax="true"
-					action="#{fileUploadView.processa}" disabled="false"
-					update="emProcessamento" />
-			</p:panel>
-			<p:panel id="emProcessamento"
-				visible="#{fileUploadView.emProcessamento}">
-			...em processamento
 		</p:panel>
+		<h:form id="proc">
+			<p:growl></p:growl>
+			<p:panel id="processamento"
+				visible="#{fileUploadView.fileInput != null}">
+				<h:outputText value="#{fileUploadView.fileInput.name}"></h:outputText>
+				<p:panel id="emProcessamento"
+					visible="#{fileUploadView.emProcessamento}">
+					...em processamento
+				</p:panel>
+				<p:poll interval="5" update="download"
+					stop="#{!fileUploadView.emProcessamento}"></p:poll>
+				<div>
+				<p:commandButton value="Quebra Previa" ajax="true"
+					action="#{fileUploadView.processa}" 
+					disabled="#{fileUploadView.emProcessamento or fileUploadView.fileInput == null}"
+					update="@form" />
+					
+				</div>
+			</p:panel>
 
-			<p:poll interval="10" update="emProcessamento"></p:poll>
+
 
 		</h:form>
 
 		<script type="text/javascript">
-		//<![CDATA[
-		function start() {
-			PF('statusDialog').show();
-		}
+			//<![CDATA[
+			function start() {
+				PF('statusDialog').show();
+			}
 
-		function stop() {
-			PF('statusDialog').hide();
-		}
-		//]]>
-	</script>
+			function stop() {
+				PF('statusDialog').hide();
+			}
+			//]]>
+		</script>
 
 
-		<p:panel header="Download"
+		<p:panel id="download" header="Download"
 			visible="#{fileUploadView.fileNameOutput!=null}">
 
 			<p:dialog modal="true" widgetVar="statusDialog" header="Status"
@@ -60,6 +66,7 @@
 				<p:graphicImage name="/demo/images/ajaxloadingbar.gif" />
 			</p:dialog>
 			<h:form>
+				<p:growl></p:growl>
 				<h:inputHidden value="#{fileUploadView.fileNameOutput}" />
 				<p:commandLink value="Download"
 					onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false"
