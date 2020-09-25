@@ -174,6 +174,10 @@ public class FileUploadView {
 		}
 	}
 
+	public void finalizar() {
+		FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
+	}
+	
 	public boolean getEmProcessamento() {
 		System.out.println(new Date() + " " + emProcessamento);
 		return emProcessamento;
