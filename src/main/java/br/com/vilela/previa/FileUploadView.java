@@ -13,8 +13,8 @@ import java.util.UUID;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
+import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
-import javax.faces.view.ViewScoped;
 
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.DefaultStreamedContent;
@@ -22,7 +22,7 @@ import org.primefaces.model.StreamedContent;
 import org.primefaces.model.file.UploadedFile;
 
 @ManagedBean
-@ViewScoped
+@SessionScoped
 public class FileUploadView {
 
 	private LeitorPrevia leitor;
@@ -32,32 +32,32 @@ public class FileUploadView {
 	private String fileNameOutput;
 
 	private StreamedContent fileOutput;
-	
+
 	private File fileInput;
 
-	private boolean emProcessamento=false;
-	@ManagedProperty("#{param.fileNameInput}")
+	private boolean emProcessamento = false;
+	//@ManagedProperty("#{param.fileNameInput}")
 	private String fileNameInput;
-	
+
 	private String time;
-	
-    public void handleFileUpload(FileUploadEvent event) {
-        FacesMessage msg = new FacesMessage("Successful", event.getFile().getFileName() + " is uploaded.");
-        try {
-        	file = event.getFile();
+
+	public void handleFileUpload(FileUploadEvent event) {
+		FacesMessage msg = new FacesMessage("Successful", event.getFile().getFileName() + " is uploaded.");
+		try {
+			file = event.getFile();
 			upload();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        FacesContext.getCurrentInstance().addMessage(null, msg);
-    }	
-	
+		FacesContext.getCurrentInstance().addMessage(null, msg);
+	}
+
 	public StreamedContent getFileOutput() {
 		if (fileNameOutput != null) {
 			System.out.println("download: " + fileNameOutput);
 //			InputStream stream = ((ServletContext)FacesContext.getCurrentInstance().getExternalContext().getContext()).getResourceAsStream(fileNameOutput);
-			InputStream stream=null;
+			InputStream stream = null;
 			try {
 				stream = new FileInputStream(fileNameOutput);
 			} catch (FileNotFoundException e) {
@@ -65,14 +65,11 @@ public class FileUploadView {
 				e.printStackTrace();
 			}
 
-			fileOutput = new DefaultStreamedContent(
-					stream,
-					"application/zip", "previa.zip");
+			fileOutput = new DefaultStreamedContent(stream, "application/zip", "previa.zip");
 			System.out.println(fileOutput);
 		}
 		return fileOutput;
 	}
-
 
 	private File saidaFile;
 
@@ -98,9 +95,8 @@ public class FileUploadView {
 
 	}
 
-	
 	public String upload() throws IOException {
-		fileInput  = saveUpload();
+		fileInput = saveUpload();
 		this.fileNameInput = fileInput.getAbsolutePath();
 		return null;
 	}
@@ -111,27 +107,33 @@ public class FileUploadView {
 
 	public void processa() throws IOException {
 		System.out.println("Em processamento");
-		emProcessamento=true;
-		
-		try {
-			if (fileNameInput != null) {
-				
-				File saida = createTempDir();
-				saidaFile = new File(createTempDir(), "previa.zip");
-				leitor = new LeitorPrevia();
-				leitor.run(fileNameInput, saida.getAbsolutePath());
-	
-				ZipUtils appZip = new ZipUtils(saida.getAbsolutePath());
-				appZip.generateFileList(saida);
-				appZip.zipIt(saidaFile.getAbsolutePath());
-				fileNameOutput = saidaFile.getAbsolutePath();
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Arquivo processado "));
-	
-			}
-		}finally {
-			emProcessamento=false;
+		emProcessamento = true;
+
+		if (fileNameInput != null) {
+			new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+					try {
+						File saida = createTempDir();
+						saidaFile = new File(createTempDir(), "previa.zip");
+						leitor = new LeitorPrevia();
+						leitor.run(fileNameInput, saida.getAbsolutePath());
+
+						ZipUtils appZip = new ZipUtils(saida.getAbsolutePath());
+						appZip.generateFileList(saida);
+						appZip.zipIt(saidaFile.getAbsolutePath());
+						fileNameOutput = saidaFile.getAbsolutePath();
+					} catch (Exception e) {
+						System.out.println(e);
+					} finally {
+						emProcessamento = false;
+					}
+				}
+			}).start();
+
 		}
-		
+
 	}
 
 	private File saveUpload() throws IOException {
@@ -173,12 +175,14 @@ public class FileUploadView {
 	}
 
 	public boolean getEmProcessamento() {
+		System.out.println(new Date() + " " + emProcessamento);
 		return emProcessamento;
 	}
 
 	public File getFileInput() {
 		return fileInput;
 	}
+
 	public String getFileNameOutput() {
 		return fileNameOutput;
 	}
