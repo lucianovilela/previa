@@ -6,12 +6,15 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.UUID;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
-import javax.faces.bean.SessionScoped;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.context.FacesContext;
+import javax.faces.view.ViewScoped;
 
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.DefaultStreamedContent;
@@ -19,7 +22,7 @@ import org.primefaces.model.StreamedContent;
 import org.primefaces.model.file.UploadedFile;
 
 @ManagedBean
-@SessionScoped
+@ViewScoped
 public class FileUploadView {
 
 	private LeitorPrevia leitor;
@@ -33,6 +36,10 @@ public class FileUploadView {
 	private File fileInput;
 
 	private boolean emProcessamento=false;
+	@ManagedProperty("#{param.fileNameInput}")
+	private String fileNameInput;
+	
+	private String time;
 	
     public void handleFileUpload(FileUploadEvent event) {
         FacesMessage msg = new FacesMessage("Successful", event.getFile().getFileName() + " is uploaded.");
@@ -94,6 +101,7 @@ public class FileUploadView {
 	
 	public String upload() throws IOException {
 		fileInput  = saveUpload();
+		this.fileNameInput = fileInput.getAbsolutePath();
 		return null;
 	}
 
@@ -102,15 +110,16 @@ public class FileUploadView {
 	}
 
 	public void processa() throws IOException {
+		System.out.println("Em processamento");
 		emProcessamento=true;
+		
 		try {
-			if (fileInput != null) {
-	
+			if (fileNameInput != null) {
 				
 				File saida = createTempDir();
 				saidaFile = new File(createTempDir(), "previa.zip");
 				leitor = new LeitorPrevia();
-				leitor.run(fileInput.getAbsolutePath(), saida.getAbsolutePath());
+				leitor.run(fileNameInput, saida.getAbsolutePath());
 	
 				ZipUtils appZip = new ZipUtils(saida.getAbsolutePath());
 				appZip.generateFileList(saida);
@@ -176,6 +185,22 @@ public class FileUploadView {
 
 	public void setFileNameOutput(String fileNameOutput) {
 		this.fileNameOutput = fileNameOutput;
+	}
+
+	public String getFileNameInput() {
+		return fileNameInput;
+	}
+
+	public void setFileNameInput(String fileNameInput) {
+		this.fileNameInput = fileNameInput;
+	}
+
+	public String getTime() {
+		return Calendar.getInstance().getTime().toString();
+	}
+
+	public void setTime(String time) {
+		this.time = time;
 	}
 
 }
