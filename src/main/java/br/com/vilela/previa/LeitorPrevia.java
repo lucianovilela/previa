@@ -3,14 +3,13 @@ package br.com.vilela.previa;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.pdfbox.exceptions.COSVisitorException;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.util.PDFTextStripper;
+import org.apache.pdfbox.pdmodel.PDPageTree;
+import org.apache.pdfbox.text.PDFTextStripper;
 
 
 
@@ -44,7 +43,7 @@ public class LeitorPrevia {
 		 Pattern.MULTILINE);
 
 		previa = PDDocument.load(arquivoEntrada);
-		List pagList = previa.getDocumentCatalog().getAllPages();
+		PDPageTree pagList = previa.getDocumentCatalog().getPages();
 		PDFTextStripper ts = new PDFTextStripper();
 		String regional = "";
 		int pgInicial = 0;
@@ -83,7 +82,7 @@ public class LeitorPrevia {
 
 	}
 
-	private void geraArquivo(List doc, String regional, int pgInicial, int pgFinal)
+	private void geraArquivo(PDPageTree doc, String regional, int pgInicial, int pgFinal)
 			throws IOException {
 		regional = regional.replaceAll("[\\s\\/\\,\\-]", "_");
 		PDDocument newDoc = new PDDocument();
@@ -92,7 +91,7 @@ public class LeitorPrevia {
 			PDPage pg = newDoc.importPage(pgOld);
 			pg.setCropBox(pgOld.getCropBox());
 			pg.setMediaBox(pgOld.getMediaBox());
-			pg.setRotation(pgOld.findRotation());
+			pg.setRotation(pgOld.getRotation());
 			// pg.setMediaBox(PDPage.PAGE_SIZE_A4);
 
 		}
@@ -108,7 +107,7 @@ public class LeitorPrevia {
 		// ByteArrayOutputStream s = new ByteArrayOutputStream();
 		try {
 			newDoc.save(s);
-		} catch (COSVisitorException e) {
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
